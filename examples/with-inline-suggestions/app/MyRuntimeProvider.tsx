@@ -11,8 +11,13 @@ export function MyRuntimeProvider({
 }>) {
   const chat = useChat({
     api: "/api/chat",
+    initialMessages: [{
+      id: "1",
+      content: "Hello",
+      role: "assistant",
+    }]
   });
-
+ 
   const runtime = useVercelUseChatRuntime(chat);
 
   return (
