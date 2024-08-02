@@ -9,7 +9,7 @@ const AI_ThreadSuggestion: FC<PropsWithChildren<{}>> = ({ children }) => {
   const lastAssistantMessage = useLastAssistantMessage();
   const [output, setOutput] = useState<string | null>(null);
   const [output2, setOutput2] = useState<string | null>(null);
-
+  let debounceTimeout: NodeJS.Timeout;
   const handleClick = useCallback(async () => {
     const lastMessageContent = lastAssistantMessage?.content;
     const lastMessageString = JSON.stringify(lastMessageContent);
@@ -37,7 +37,17 @@ const AI_ThreadSuggestion: FC<PropsWithChildren<{}>> = ({ children }) => {
 
   useEffect(() => {
     if (lastAssistantMessage) {
+      if (debounceTimeout) {
+        clearTimeout(debounceTimeout);
+      }
+
+      debounceTimeout = setTimeout(() => {
       handleClick();
+      }, 1000);
+
+      return () => {
+        clearTimeout(debounceTimeout);
+      };
     }
   }, [lastAssistantMessage, handleClick]);
 

@@ -4,8 +4,9 @@ import {
   ComposerPrimitive,
   MessagePrimitive,
   ThreadPrimitive,
+  useThreadContext,
 } from "@assistant-ui/react";
-import React, { type FC } from "react";
+import React, { useEffect, useMemo, type FC } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,9 +21,12 @@ import AI_ThreadSuggestion from "./AI_ThreadSuggestion";
 import ThreadSuggestion from "./ThreadSuggestion";
 
 export const Thread: FC = () => {
-  {
-    /* This is UI for ongoing chat */
-  }
+    
+
+  const {
+    useThreadMessages,
+  } = useThreadContext();
+  let assistantMessages = useThreadMessages();
   return (
     <TooltipProvider>
       <ThreadPrimitive.Root className="bg-background h-full">
@@ -35,17 +39,17 @@ export const Thread: FC = () => {
             }}
           />
           <div className="sticky bottom-0 mt-4 flex w-full max-w-2xl flex-grow flex-col items-center justify-end rounded-t-lg bg-inherit pb-4">
-            <ThreadPrimitive.If empty={false}>
+            {/* <ThreadPrimitive.If empty={false}>
               <div className="mb-4 w-full px-4">
                 <div className="flex flex-wrap justify-center gap-4">
                   <ThreadPrimitive.If running={false}>
                     {" "}
-                    {/*Important to wrap Thread suggestion into if statement since the original message is streamed and we don't want to generate buttons ahead of time*/}
                     <AI_ThreadSuggestion></AI_ThreadSuggestion>
                   </ThreadPrimitive.If>
                 </div>
               </div>
-            </ThreadPrimitive.If>
+            </ThreadPrimitive.If> */}
+            <SuggestionComponent  chatMessagesLength={assistantMessages?.length}/>
             <Composer />
           </div>
         </ThreadPrimitive.Viewport>
@@ -131,4 +135,22 @@ const AssistantMessage: FC = () => {
       </div>
     </MessagePrimitive.Root>
   );
+};
+
+const SuggestionComponent = ({ chatMessagesLength }:{chatMessagesLength: number}) => {
+  const renderedContent = useMemo(() => (
+    <ThreadPrimitive.If empty={false}>
+      <div className="mb-4 w-full px-4">
+        <div className="flex flex-wrap justify-center gap-4">
+          <ThreadPrimitive.If running={false}>
+            {" "}
+            {/*Important to wrap Thread suggestion into if statement since the original message is streamed and we don't want to generate buttons ahead of time*/}
+            <AI_ThreadSuggestion></AI_ThreadSuggestion>
+          </ThreadPrimitive.If>
+        </div>
+      </div>
+    </ThreadPrimitive.If>
+  ), [chatMessagesLength]);
+
+  return renderedContent;
 };
